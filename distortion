@@ -1,0 +1,28 @@
+from PIL import Image
+import os
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+def loadImages(path="."):
+    return [os.path.join(path, f) for f in os.listdir(path) if f.endswith('.png')]
+
+
+filenames = (loadImages())
+images = []
+for file in filenames:
+    img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
+    A = img.shape[0] / 4.0
+    w = 1.0 / img.shape[1]
+    shift = lambda x: A * np.sin(2.0 * np.pi * x * w)
+
+    for i in range(img.shape[0]):
+        img[:, i] = np.roll(img[:, i], int(shift(i)))
+
+    images.append(img)
+
+num = 1
+for image in images:
+    cv2.imwrite(str(num) + ".jpg", image)
+    num += 1
